@@ -2,8 +2,9 @@ import * as _ from 'lodash';
 import { EventsService } from '../events.service';
 import { EventsMockService } from './events-mock.service';
 import { EventsMockData } from '../../mock-data/event';
-import { BusinessError } from '../../../errors/BusinessError';
-import { DateTime } from '../../../utils/DateTime';
+import { BusinessError } from '../../../errors/business.error';
+import { DateTime } from '../../../utils/date-time';
+import { EventNotFoundError } from '../../errors/event-not-found.error';
 
 describe('EventsMockService', () => {
   let eventsService: EventsService;
@@ -81,6 +82,20 @@ describe('EventsMockService', () => {
     it('is defined of type function', () => {
       expect(eventsService.getEvent).toBeDefined();
       expect(typeof eventsService.getEvent).toBe('function');
+    });
+
+    it('should get existing event', async () => {
+      const randomEvent = EventsMockData.find((item) => item.id!!);
+
+      const result = await eventsService.getEvent(randomEvent.id);
+
+      expect(result.id).toEqual(randomEvent.id);
+    });
+
+    it('should throw error if event does not exist', async () => {
+      await expect(async () => {
+        eventsService.getEvent('some random id');
+      }).rejects.toThrowError(EventNotFoundError);
     });
   });
 

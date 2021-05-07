@@ -1,9 +1,11 @@
 import * as _ from 'lodash';
 import { EventsService } from '../events.service';
 import { Event } from '../../models/event';
-import { DateValidator } from '../../../utils/DateFormatValidator';
-import { BusinessError } from '../../../errors/BusinessError';
-import { DateTime } from '../../../utils/DateTime';
+import { DateValidator } from '../../../utils/date-format-validator';
+import { BusinessError } from '../../../errors/business.error';
+import { DateTime } from '../../../utils/date-time';
+import { EventNotFoundError } from '../../errors/event-not-found.error';
+import { DateRangeValidator } from '../../validators/date-range.validator';
 
 /* eslint-disable */
 export class EventsMockService implements EventsService {
@@ -19,17 +21,7 @@ export class EventsMockService implements EventsService {
   }
 
   private validateParams(dateFrom: string, dateTo: string) {
-    if (!DateValidator.isISO(dateFrom)) {
-      throw new BusinessError('Date from is not in ISO format');
-    }
-
-    if (!DateValidator.isISO(dateTo)) {
-      throw new BusinessError('Date to is not in ISO format');
-    }
-
-    if (new DateTime(dateFrom).isAfter(dateTo)) {
-      throw new BusinessError('Date to cannot be younger than date from');
-    }
+    DateRangeValidator.validate(dateFrom, dateTo);
 
     const lastEvent = _(this._events)
       .sortBy((item) => new Date(item.endDate))
@@ -41,8 +33,12 @@ export class EventsMockService implements EventsService {
   }
 
   getEvent(id: string): Promise<Event> {
-    // @ts-ignore
-    return Promise.resolve(this._events.find((event) => event.id === id)); // todo: implement method
+    const event = this._events.find((item) => item.id === id);
+
+    if (!event) {
+      throw new EventNotFoundError();
+    }
+    return Promise.resolve(this._events.find((item) => item.id === id)); // todo: implement method
   }
 
   getEvents(

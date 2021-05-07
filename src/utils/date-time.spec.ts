@@ -1,4 +1,4 @@
-import { DateTime } from './DateTime';
+import { DateTime } from './date-time';
 
 describe('DateTime', () => {
   describe('isAfter', () => {
