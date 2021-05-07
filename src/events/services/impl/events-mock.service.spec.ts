@@ -153,6 +153,21 @@ describe('EventsMockService', () => {
       expect(eventsService.removeEvent).toBeDefined();
       expect(typeof eventsService.removeEvent).toBe('function');
     });
+
+    it('should remove event', async () => {
+      const randomItem = _.sample(EventsMockData);
+      await eventsService.removeEvent(randomItem.id);
+
+      await expect(async () => {
+        eventsService.getEvent(randomItem.id);
+      }).rejects.toThrowError(EventNotFoundError);
+    });
+
+    it('should throw error if item does not exist', async () => {
+      await expect(async () => {
+        eventsService.removeEvent('some not existing id');
+      }).rejects.toThrowError(EventNotFoundError);
+    });
   });
 
   const getLastEvent = () =>

@@ -56,7 +56,13 @@ export class EventsMockService implements EventsService {
   }
 
   removeEvent(id: string): Promise<void> {
-    // @ts-ignore
-    return Promise.resolve({}); // todo: implement method
+    const indexOfEventToRemove = this._events.findIndex((item) => item.id === id);
+
+    if (indexOfEventToRemove === -1) {
+      throw new EventNotFoundError();
+    }
+
+    this._events.splice(indexOfEventToRemove, 1);
+    return Promise.resolve();
   }
 }
