@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import { EventsService } from '../events.service';
 import { Event } from '../../models/event';
-import { DateValidator } from '../../../utils/date-format-validator';
 import { BusinessError } from '../../../errors/business.error';
 import { DateTime } from '../../../utils/date-time';
 import { EventNotFoundError } from '../../errors/event-not-found.error';
@@ -38,7 +37,7 @@ export class EventsMockService implements EventsService {
     if (!event) {
       throw new EventNotFoundError();
     }
-    return Promise.resolve(this._events.find((item) => item.id === id)); // todo: implement method
+    return Promise.resolve(this._events.find((item) => item.id === id));
   }
 
   getEvents(
@@ -47,8 +46,13 @@ export class EventsMockService implements EventsService {
     offset: number,
     limit: number,
   ): Promise<{ totalCount: number; events: Event[] }> {
-    // @ts-ignore
-    return Promise.resolve({}); // todo: implement method
+    DateRangeValidator.validate(dateFrom, dateTo);
+
+    const events = this._events
+      .filter((item) => new DateTime(item.startDate).isBetween(dateFrom, dateTo))
+      .slice(offset, offset + limit);
+
+    return Promise.resolve({ events, totalCount: events.length });
   }
 
   removeEvent(id: string): Promise<void> {

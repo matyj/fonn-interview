@@ -5,6 +5,7 @@ import { EventsMockData } from '../../mock-data/event';
 import { BusinessError } from '../../../errors/business.error';
 import { DateTime } from '../../../utils/date-time';
 import { EventNotFoundError } from '../../errors/event-not-found.error';
+import { off } from 'node:process';
 
 describe('EventsMockService', () => {
   let eventsService: EventsService;
@@ -85,7 +86,7 @@ describe('EventsMockService', () => {
     });
 
     it('should get existing event', async () => {
-      const randomEvent = EventsMockData.find((item) => item.id!!);
+      const randomEvent = _.sample(EventsMockData);
 
       const result = await eventsService.getEvent(randomEvent.id);
 
@@ -103,6 +104,47 @@ describe('EventsMockService', () => {
     it('is defined of type function', () => {
       expect(eventsService.getEvents).toBeDefined();
       expect(typeof eventsService.getEvents).toBe('function');
+    });
+
+    it('should get events for given date range', async () => {
+      const dateFrom = '2020-05-05';
+      const dateTo = '2020-05-06';
+
+      const expectedResult = EventsMockData.filter((item) => new DateTime(item.startDate).isBetween(dateFrom, dateTo));
+      const { events } = await eventsService.getEvents(dateFrom, dateTo, 0, 10);
+
+      expect(events).toEqual(expectedResult);
+    });
+
+    it('should get events with the given offset', async () => {
+      const dateFrom = '2020-01-05';
+      const dateTo = '2020-05-06';
+
+      const offset = 10;
+
+      const limit = 20;
+
+      const itemsFromRange = EventsMockData.filter((item) => new DateTime(item.startDate).isBetween(dateFrom, dateTo));
+
+      expect(itemsFromRange.length).toBeGreaterThan(offset + limit);
+
+      const expectedResult = itemsFromRange.slice(offset, offset + limit);
+
+      const { events } = await eventsService.getEvents(dateFrom, dateTo, offset, limit);
+
+      expect(events).toEqual(expectedResult);
+    });
+
+    it('should throw error if date from is not iso', async () => {
+      await expect(async () => {
+        eventsService.getEvents('2021-05-kk', '2021-05-06', 0, 0);
+      }).rejects.toThrowError(new BusinessError('Date from is not in ISO format'));
+    });
+
+    it('should throw error if date to is not iso', async () => {
+      await expect(async () => {
+        eventsService.getEvents('2021-05-05', '2021-05-hh', 0, 0);
+      }).rejects.toThrowError(new BusinessError('Date to is not in ISO format'));
     });
   });
 
