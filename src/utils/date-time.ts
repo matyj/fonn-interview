@@ -8,7 +8,11 @@ export class DateTime {
   }
 
   isAfter(date: string): boolean {
-    return this.instance.isAfter(moment(date));
+    return this.instance.isAfter(date);
+  }
+
+  isBetween(dateFrom: string, dateTo: string) {
+    return this.instance.isBetween(dateFrom, dateTo);
   }
 
   addDays(days: number) {
