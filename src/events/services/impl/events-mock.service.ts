@@ -5,6 +5,7 @@ import { BusinessError } from '../../../errors/business.error';
 import { DateTime } from '../../../utils/date-time';
 import { EventNotFoundError } from '../../errors/event-not-found.error';
 import { DateRangeValidator } from '../../validators/date-range.validator';
+import { uniqueId } from '../../../utils/unique-id.generator';
 
 /* eslint-disable */
 export class EventsMockService implements EventsService {
@@ -13,7 +14,7 @@ export class EventsMockService implements EventsService {
   createEvent(dateFrom: string, dateTo: string, title: string): Promise<Event> {
     this.validateParams(dateFrom, dateTo);
 
-    const newEvent = { id: 'id', startDate: dateFrom, endDate: dateTo, title };
+    const newEvent = { id: uniqueId(), startDate: dateFrom, endDate: dateTo, title };
     this._events.push(newEvent);
 
     return Promise.resolve(newEvent);

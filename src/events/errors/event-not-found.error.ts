@@ -1,3 +1,3 @@
-import { BusinessError } from '../../errors/business.error';
+import { ResourceNotFoundError } from '../../errors/resource-not-found.error';
 
-export class EventNotFoundError extends BusinessError {}
+export class EventNotFoundError extends ResourceNotFoundError {}
