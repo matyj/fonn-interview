@@ -2,10 +2,9 @@ import * as _ from 'lodash';
 import { EventsService } from '../events.service';
 import { EventsMockService } from './events-mock.service';
 import { EventsMockData } from '../../mock-data/event';
-import { BusinessError } from '../../../errors/business.error';
+import { InvalidDateError } from '../../../errors';
 import { DateTime } from '../../../utils/date-time';
 import { EventNotFoundError } from '../../errors/event-not-found.error';
-import { off } from 'node:process';
 
 describe('EventsMockService', () => {
   let eventsService: EventsService;
@@ -57,25 +56,25 @@ describe('EventsMockService', () => {
           new DateTime(lastEvent.startDate).addDays(1).toString(),
           'The Event',
         );
-      }).rejects.toThrowError(new BusinessError('Date from is younger then the last events end date'));
+      }).rejects.toThrowError(new InvalidDateError('Date from is younger then the last events end date'));
     });
 
     it('should throw error if date from is not iso', async () => {
       await expect(async () => {
         eventsService.createEvent('2021-05-kk', '2021-05-06', 'The Event');
-      }).rejects.toThrowError(new BusinessError('Date from is not in ISO format'));
+      }).rejects.toThrowError(new InvalidDateError('Date from is not in ISO format'));
     });
 
     it('should throw error if date to is not iso', async () => {
       await expect(async () => {
         eventsService.createEvent('2021-05-05', '2021-05-hh', 'The Event');
-      }).rejects.toThrowError(new BusinessError('Date to is not in ISO format'));
+      }).rejects.toThrowError(new InvalidDateError('Date to is not in ISO format'));
     });
 
     it('should throw error if date to is younger then date from', async () => {
       await expect(async () => {
         eventsService.createEvent('2021-05-06', '2021-05-05', 'The Event');
-      }).rejects.toThrowError(new BusinessError('Date to cannot be younger than date from'));
+      }).rejects.toThrowError(new InvalidDateError('Date to cannot be younger than date from'));
     });
   });
 
@@ -138,13 +137,13 @@ describe('EventsMockService', () => {
     it('should throw error if date from is not iso', async () => {
       await expect(async () => {
         eventsService.getEvents('2021-05-kk', '2021-05-06', 0, 0);
-      }).rejects.toThrowError(new BusinessError('Date from is not in ISO format'));
+      }).rejects.toThrowError(new InvalidDateError('Date from is not in ISO format'));
     });
 
     it('should throw error if date to is not iso', async () => {
       await expect(async () => {
         eventsService.getEvents('2021-05-05', '2021-05-hh', 0, 0);
-      }).rejects.toThrowError(new BusinessError('Date to is not in ISO format'));
+      }).rejects.toThrowError(new InvalidDateError('Date to is not in ISO format'));
     });
   });
 
