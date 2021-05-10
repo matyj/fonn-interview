@@ -1,16 +1,28 @@
 import * as _ from 'lodash';
 import { EventsService } from '../events.service';
-import { EventsMockService } from './events-mock.service';
+import { EventsMockService } from './events.service';
 import { EventsMockData } from '../../mock-data/event';
 import { InvalidDateError } from '../../../errors';
 import { DateTime } from '../../../utils/date-time';
 import { EventNotFoundError } from '../../errors/event-not-found.error';
+import { CreateEventService } from './create-event.service';
+import { InMemoryEventsRepo } from '../../../events/repos/impl/in-memory-events.repo';
+import { GetEventsService } from './get-events.service';
+import { EventsRepo } from './../../repos/events.repo';
 
 describe('EventsMockService', () => {
   let eventsService: EventsService;
 
+  let eventsRepo: EventsRepo;
+
   beforeEach(() => {
-    eventsService = new EventsMockService([...EventsMockData]);
+    eventsRepo = new InMemoryEventsRepo();
+
+    eventsService = new EventsMockService(
+      new GetEventsService(eventsRepo),
+      new CreateEventService(eventsRepo),
+      eventsRepo,
+    );
   });
 
   describe('createEvent()', () => {
@@ -62,13 +74,13 @@ describe('EventsMockService', () => {
     it('should throw error if date from is not iso', async () => {
       await expect(async () => {
         eventsService.createEvent('2021-05-kk', '2021-05-06', 'The Event');
-      }).rejects.toThrowError(new InvalidDateError('Date from is not in ISO format'));
+      }).rejects.toThrowError(new InvalidDateError('Date is not in ISO format'));
     });
 
     it('should throw error if date to is not iso', async () => {
       await expect(async () => {
         eventsService.createEvent('2021-05-05', '2021-05-hh', 'The Event');
-      }).rejects.toThrowError(new InvalidDateError('Date to is not in ISO format'));
+      }).rejects.toThrowError(new InvalidDateError('Date is not in ISO format'));
     });
 
     it('should throw error if date to is younger then date from', async () => {
@@ -109,7 +121,10 @@ describe('EventsMockService', () => {
       const dateFrom = '2020-05-05';
       const dateTo = '2020-05-06';
 
-      const expectedResult = EventsMockData.filter((item) => new DateTime(item.startDate).isBetween(dateFrom, dateTo));
+      const expectedResult = eventsRepo
+        .getAll()
+        .filter((item) => item.startDate.isBetween(new DateTime(dateFrom), new DateTime(dateTo)));
+
       const { events } = await eventsService.getEvents(dateFrom, dateTo, 0, 10);
 
       expect(events).toEqual(expectedResult);
@@ -123,7 +138,9 @@ describe('EventsMockService', () => {
 
       const limit = 20;
 
-      const itemsFromRange = EventsMockData.filter((item) => new DateTime(item.startDate).isBetween(dateFrom, dateTo));
+      const itemsFromRange = eventsRepo
+        .getAll()
+        .filter((item) => item.startDate.isBetween(new DateTime(dateFrom), new DateTime(dateTo)));
 
       expect(itemsFromRange.length).toBeGreaterThan(offset + limit);
 
@@ -137,13 +154,13 @@ describe('EventsMockService', () => {
     it('should throw error if date from is not iso', async () => {
       await expect(async () => {
         eventsService.getEvents('2021-05-kk', '2021-05-06', 0, 0);
-      }).rejects.toThrowError(new InvalidDateError('Date from is not in ISO format'));
+      }).rejects.toThrowError(new InvalidDateError('Date is not in ISO format'));
     });
 
     it('should throw error if date to is not iso', async () => {
       await expect(async () => {
         eventsService.getEvents('2021-05-05', '2021-05-hh', 0, 0);
-      }).rejects.toThrowError(new InvalidDateError('Date to is not in ISO format'));
+      }).rejects.toThrowError(new InvalidDateError('Date is not in ISO format'));
     });
   });
 

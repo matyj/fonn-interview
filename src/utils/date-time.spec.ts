@@ -4,17 +4,17 @@ describe('DateTime', () => {
   describe('isAfter', () => {
     it('should return true if the passed date is same', () => {
       const target = new DateTime('2020-10-10');
-      expect(target.isAfter('2020-10-09')).toBeTruthy();
+      expect(target.isAfter(new DateTime('2020-10-09'))).toBeTruthy();
     });
 
     it('should return false if the passed date is not after', () => {
       const target = new DateTime('2020-10-10');
-      expect(target.isAfter('2020-10-11')).toBeFalsy();
+      expect(target.isAfter(new DateTime('2020-10-11'))).toBeFalsy();
     });
 
     it('should return false if the passed date is same', () => {
       const target = new DateTime('2020-10-10');
-      expect(target.isAfter('2020-10-10')).toBeFalsy();
+      expect(target.isAfter(new DateTime('2020-10-10'))).toBeFalsy();
     });
   });
 
@@ -31,17 +31,17 @@ describe('DateTime', () => {
   describe('isBetween', () => {
     it('should return true if date is between', () => {
       const target = new DateTime('2020-10-10');
-      expect(target.isBetween('2020-10-09', '2020-10-11')).toBeTruthy();
+      expect(target.isBetween(new DateTime('2020-10-09'), new DateTime('2020-10-11'))).toBeTruthy();
     });
 
     it('should return false if date is before', () => {
       const target = new DateTime('2020-10-08');
-      expect(target.isBetween('2020-10-09', '2020-10-11')).toBeFalsy();
+      expect(target.isBetween(new DateTime('2020-10-09'), new DateTime('2020-10-11'))).toBeFalsy();
     });
 
     it('should return false if date is after', () => {
       const target = new DateTime('2020-10-12');
-      expect(target.isBetween('2020-10-09', '2020-10-11')).toBeFalsy();
+      expect(target.isBetween(new DateTime('2020-10-09'), new DateTime('2020-10-11'))).toBeFalsy();
     });
   });
 });
