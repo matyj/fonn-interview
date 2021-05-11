@@ -85,7 +85,7 @@ describe('EventsMockService', () => {
 
     it('should throw error if date to is younger then date from', async () => {
       await expect(async () => {
-        eventsService.createEvent('2021-05-06', '2021-05-05', 'The Event');
+        eventsService.createEvent('2020-01-06T14:00:00.000Z', '2020-01-05T14:00:00.000Z', 'The Event');
       }).rejects.toThrowError(new InvalidDateError('Date to cannot be younger than date from'));
     });
   });
@@ -118,8 +118,8 @@ describe('EventsMockService', () => {
     });
 
     it('should get events for given date range', async () => {
-      const dateFrom = '2020-05-05';
-      const dateTo = '2020-05-06';
+      const dateFrom = '2020-01-05T14:00:00.000Z';
+      const dateTo = '2020-01-06T14:00:00.000Z';
 
       const expectedResult = eventsRepo
         .getAll()
@@ -131,8 +131,8 @@ describe('EventsMockService', () => {
     });
 
     it('should get events with the given offset', async () => {
-      const dateFrom = '2020-01-05';
-      const dateTo = '2020-05-06';
+      const dateFrom = '2020-01-05T00:00:00.000Z';
+      const dateTo = '2020-05-06T23:59:59.999Z';
 
       const offset = 10;
 

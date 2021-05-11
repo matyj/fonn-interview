@@ -25,7 +25,7 @@ export class CreateEventService {
       .sortBy((item) => new Date(item.endDate))
       .last();
 
-    if (new DateTime(lastEvent.startDate).isAfter(dateFrom)) {
+    if (lastEvent.startDate.isAfter(dateFrom)) {
       throw new BusinessError('Date from is younger then the last events end date');
     }
   }
