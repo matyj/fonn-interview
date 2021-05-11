@@ -18,7 +18,7 @@ export class InMemoryEventsRepo implements EventsRepo {
       throw new EventNotFoundError();
     }
 
-    return item;
+    return Promise.resolve(item);
   }
 
   remove(id: string) {
@@ -34,9 +34,14 @@ export class InMemoryEventsRepo implements EventsRepo {
 
   save(event: Event) {
     this.items.push(event);
+    return Promise.resolve();
   }
 
   getAll() {
-    return this.items;
+    return Promise.resolve(this.items);
+  }
+
+  clear() {
+    this.items = [];
   }
 }
